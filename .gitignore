@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.venv/
+tasktracker.sqlite3
+instance/

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TeamTask - Task Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="side-nav">
+      <div class="brand-block">
+        <div class="brand-mark">TT</div>
+        <div>
+          <p class="eyebrow">Team workspace</p>
+          <h1>TeamTask</h1>
+        </div>
+      </div>
+
+      <nav class="tabs" aria-label="Task tracker views">
+        <button class="tab active" type="button" data-view="grid"><span>Work grid</span></button>
+        <button class="tab" type="button" data-view="board"><span>Task board</span></button>
+        <button class="tab" type="button" data-view="charts"><span>Insights</span></button>
+        <button class="tab" type="button" data-view="projects"><span>Projects</span></button>
+        <button class="tab" type="button" data-view="members"><span>Team Members</span></button>
+        <button class="tab" type="button" data-view="onboard-project"><span>Onboard Project</span></button>
+        <button class="tab" type="button" data-view="onboard-member"><span>Onboard Member</span></button>
+      </nav>
+
+      <div class="side-card">
+        <span>Current project</span>
+        <strong id="sideProjectName">Delivery Operations</strong>
+        <p id="sideProjectMeta">Local prototype with browser persistence.</p>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-header">
+        <div class="page-title">
+          <h2>Tasks</h2>
+          <span id="headerProjectMeta">All projects</span>
+        </div>
+        <div class="header-actions">
+          <div class="field header-field" data-task-header-control>
+            <label for="projectSelector">Project</label>
+            <select id="projectSelector"></select>
+          </div>
+          <button class="btn secondary" id="seedDataBtn" data-task-header-control type="button">Load sample data</button>
+          <button class="btn primary" id="newTaskBtn" data-task-only type="button">New task</button>
+        </div>
+      </header>
+
+  <main class="workspace">
+    <section class="summary-strip" data-task-panel aria-label="Task summary">
+      <div class="summary-item">
+        <span>Total tasks</span>
+        <strong id="totalTasks">0</strong>
+      </div>
+      <div class="summary-item">
+        <span>In progress</span>
+        <strong id="inProgressTasks">0</strong>
+      </div>
+      <div class="summary-item">
+        <span>Blocked</span>
+        <strong id="blockedTasks">0</strong>
+      </div>
+      <div class="summary-item">
+        <span>Completed</span>
+        <strong id="completedTasks">0</strong>
+      </div>
+    </section>
+
+    <section class="view active" id="gridView" data-view-panel="grid">
+      <div class="toolbar">
+        <div class="field compact">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="search" placeholder="Search summary, details, owner" />
+        </div>
+        <div class="field compact">
+          <label for="statusFilter">Status</label>
+          <select id="statusFilter"></select>
+        </div>
+        <div class="field compact">
+          <label for="assigneeFilter">Assignee</label>
+          <select id="assigneeFilter"></select>
+        </div>
+        <div class="field compact">
+          <label for="labelFilter">Label</label>
+          <select id="labelFilter"></select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Project</th>
+              <th>Status</th>
+              <th>Assignee</th>
+              <th>Labels</th>
+              <th>Priority</th>
+              <th>Due date</th>
+              <th>Attachments</th>
+            </tr>
+          </thead>
+          <tbody id="taskTableBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state hidden" id="gridEmpty">No tasks match this view.</div>
+    </section>
+
+    <section class="view" id="boardView" data-view-panel="board">
+      <div class="kanban-board" id="kanbanBoard"></div>
+    </section>
+
+    <section class="view" id="chartsView" data-view-panel="charts">
+      <div class="chart-layout">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Status distribution</h2>
+            <span id="statusChartTotal">0 tasks</span>
+          </div>
+          <div class="bar-chart" id="statusChart"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Work by team member</h2>
+            <span id="memberChartTotal">0 assigned</span>
+          </div>
+          <div class="bar-chart" id="memberChart"></div>
+        </section>
+        <section class="panel wide">
+          <div class="panel-heading">
+            <h2>Board health</h2>
+            <span>Open vs completed</span>
+          </div>
+          <div class="health-grid" id="healthGrid"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="projectsView" data-view-panel="projects">
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>List of Project</h2>
+          <span id="projectCount">0 projects</span>
+        </div>
+        <div class="toolbar table-toolbar">
+          <div class="field compact">
+            <label for="projectSearchInput">Search</label>
+            <input id="projectSearchInput" type="search" placeholder="Search project, key, labels" />
+          </div>
+          <div class="field compact">
+            <label for="projectStatusFilter">Status</label>
+            <select id="projectStatusFilter">
+              <option value="all">All statuses</option>
+              <option value="active">Active</option>
+              <option value="in-progress">In progress</option>
+              <option value="completed">Completed</option>
+              <option value="paused">Paused</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="project-table">
+            <thead>
+              <tr>
+                <th>Project name</th>
+                <th>Status</th>
+                <th>Start date</th>
+                <th>End date</th>
+                <th>Members</th>
+                <th>Tasks</th>
+                <th>Labels</th>
+              </tr>
+            </thead>
+            <tbody id="projectList"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="membersView" data-view-panel="members">
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>List of Team Members</h2>
+          <span id="memberCount">0 people</span>
+        </div>
+        <div class="toolbar table-toolbar">
+          <div class="field compact">
+            <label for="memberSearchInput">Search</label>
+            <input id="memberSearchInput" type="search" placeholder="Search member, role, email" />
+          </div>
+          <div class="field compact">
+            <label for="memberProjectFilter">Project</label>
+            <select id="memberProjectFilter"></select>
+          </div>
+          <div class="field compact">
+            <label for="memberTaskFilter">Project tasks</label>
+            <select id="memberTaskFilter">
+              <option value="all">All task counts</option>
+              <option value="with-tasks">With tasks</option>
+              <option value="no-tasks">No tasks</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="member-table">
+            <thead>
+              <tr>
+                <th>Member name</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Project</th>
+                <th>Total tasks</th>
+                <th>Project tasks</th>
+              </tr>
+            </thead>
+            <tbody id="memberList"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="onboardProjectView" data-view-panel="onboard-project">
+      <form class="panel form-panel narrow-panel" id="projectForm">
+        <h2>Onboard project</h2>
+        <div class="field">
+          <label for="projectName">Project name</label>
+          <input id="projectName" required placeholder="Example: Customer Portal" />
+        </div>
+        <div class="field">
+          <label for="projectCode">Project key</label>
+          <input id="projectCode" required maxlength="8" placeholder="Example: CP" />
+        </div>
+        <div class="field">
+          <label for="projectStatus">Project status</label>
+          <select id="projectStatus">
+            <option value="active">Active</option>
+            <option value="in-progress">In progress</option>
+            <option value="completed">Completed</option>
+            <option value="paused">Paused</option>
+          </select>
+        </div>
+        <div class="form-grid compact-grid">
+          <div class="field">
+            <label for="projectStartDate">Start date</label>
+            <input id="projectStartDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="projectEndDate">End date</label>
+            <input id="projectEndDate" type="date" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="projectDescription">Description</label>
+          <textarea id="projectDescription" rows="4" placeholder="Project scope, owner, or delivery notes"></textarea>
+        </div>
+        <div class="field">
+          <label for="projectLabels">Suggested labels / phases</label>
+          <input id="projectLabels" placeholder="Later, Phase 1, Post MVP, Dependency" />
+        </div>
+        <button class="btn primary" type="submit">Add project</button>
+      </form>
+    </section>
+
+    <section class="view" id="onboardMemberView" data-view-panel="onboard-member">
+      <form class="panel form-panel narrow-panel" id="memberForm">
+        <h2>Onboard member</h2>
+        <div class="field">
+          <label for="memberName">Full name</label>
+          <input id="memberName" required placeholder="Example: Aisha Khan" />
+        </div>
+        <div class="field">
+          <label for="memberRole">Role</label>
+          <input id="memberRole" required placeholder="Example: Frontend Engineer" />
+        </div>
+        <div class="field">
+          <label for="memberEmail">Email</label>
+          <input id="memberEmail" type="email" placeholder="name@company.com" />
+        </div>
+        <div class="field">
+          <label>Assign to projects</label>
+          <div class="project-picker">
+            <select id="memberProjectSelect"></select>
+            <button class="btn secondary" id="addMemberProjectBtn" type="button">Add</button>
+          </div>
+          <div class="selected-project-list" id="memberProjectSelection"></div>
+        </div>
+        <button class="btn primary" type="submit">Add member</button>
+      </form>
+    </section>
+
+  </main>
+    </div>
+  </div>
+
+  <dialog class="task-dialog" id="taskDialog">
+    <form id="taskForm" method="dialog">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">Task record</p>
+          <h2 id="taskDialogTitle">New task</h2>
+        </div>
+        <button class="icon-btn" id="closeTaskDialog" type="button" aria-label="Close">x</button>
+      </div>
+
+      <input id="taskId" type="hidden" />
+
+      <div class="form-grid">
+        <div class="field span-2">
+          <label for="taskSummary">Summary</label>
+          <input id="taskSummary" required maxlength="120" placeholder="Short task title" />
+        </div>
+        <div class="field">
+          <label for="taskProject">Project</label>
+          <select id="taskProject"></select>
+        </div>
+        <div class="field">
+          <label for="taskStatus">Status</label>
+          <select id="taskStatus"></select>
+        </div>
+        <div class="field">
+          <label>Assigned members</label>
+          <div class="checkbox-list compact-list" id="taskAssigneeList"></div>
+        </div>
+        <div class="field">
+          <label for="taskPriority">Priority</label>
+          <select id="taskPriority">
+            <option>Low</option>
+            <option selected>Medium</option>
+            <option>High</option>
+            <option>Critical</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="taskDueDate">Due date</label>
+          <input id="taskDueDate" type="date" />
+        </div>
+        <div class="field span-2">
+          <label for="taskLabels">Labels / phase</label>
+          <input id="taskLabels" list="taskLabelSuggestions" placeholder="Later, Phase 2, Dependency" />
+          <datalist id="taskLabelSuggestions"></datalist>
+          <p class="hint">Use flexible labels instead of fixed phases. Separate multiple labels with commas.</p>
+        </div>
+        <div class="field span-2">
+          <label for="taskDetails">Detailed info</label>
+          <textarea id="taskDetails" rows="5" placeholder="Requirements, blockers, dependency notes, acceptance criteria"></textarea>
+        </div>
+        <div class="field span-2">
+          <label for="taskAttachments">Attachments</label>
+          <input id="taskAttachments" type="file" multiple />
+          <p class="hint">Files are tracked by name and size in this local prototype.</p>
+          <div class="attachment-list" id="attachmentPreview"></div>
+        </div>
+      </div>
+
+      <section class="task-activity-panel">
+        <div class="panel-heading compact-heading">
+          <h2>Task activity</h2>
+          <span>Stored inside this task</span>
+        </div>
+        <div class="task-activity-list" id="taskActivityList"></div>
+      </section>
+
+      <div class="dialog-actions">
+        <button class="btn danger" id="deleteTaskBtn" type="button">Delete</button>
+        <span></span>
+        <button class="btn secondary" id="cancelTaskBtn" type="button">Cancel</button>
+        <button class="btn primary" type="submit">Save task</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
