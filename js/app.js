@@ -13,13 +13,13 @@ const PROJECT_STATUSES = {
 };
 
 const VIEW_META = {
-  grid: { title: "Tasks", taskPanel: false, headerControls: true },
-  board: { title: "Task board", taskPanel: false, headerControls: true },
-  charts: { title: "Insights", taskPanel: true, headerControls: true },
-  projects: { title: "List of Project", taskPanel: false, headerControls: false },
-  members: { title: "List of Team Members", taskPanel: false, headerControls: false },
-  "onboard-project": { title: "Onboard Project", taskPanel: false, headerControls: false },
-  "onboard-member": { title: "Onboard Member", taskPanel: false, headerControls: false },
+  grid: { title: "Tasks", taskPanel: false, taskActions: true, headerControls: true },
+  board: { title: "Task board", taskPanel: false, taskActions: true, headerControls: true },
+  charts: { title: "Insights", taskPanel: true, taskActions: true, headerControls: true },
+  projects: { title: "List of Project", taskPanel: false, taskActions: false, headerControls: false },
+  members: { title: "List of Team Members", taskPanel: false, taskActions: false, headerControls: false },
+  "onboard-project": { title: "Onboard Project", taskPanel: false, taskActions: false, headerControls: false },
+  "onboard-member": { title: "Onboard Member", taskPanel: false, taskActions: false, headerControls: false },
 };
 
 const STORAGE_KEY = "teamtask_state_v1";
@@ -739,7 +739,7 @@ function setActiveView(viewName) {
   els.views.forEach((view) => view.classList.toggle("active", view.dataset.viewPanel === viewName));
   els.pageTitle.textContent = meta.title;
   els.taskPanels.forEach((panel) => panel.classList.toggle("hidden", !meta.taskPanel));
-  els.taskOnlyActions.forEach((action) => action.classList.toggle("hidden", !meta.taskPanel));
+  els.taskOnlyActions.forEach((action) => action.classList.toggle("hidden", !meta.taskActions));
   els.taskHeaderControls.forEach((control) => control.classList.toggle("hidden", !meta.headerControls));
   renderHeaderMeta();
 }
