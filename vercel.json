@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/tasktracker/state",
+      "destination": "/api/tasktracker/state.py"
+    }
+  ]
+}

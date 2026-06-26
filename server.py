@@ -1,52 +1,13 @@
-import json
 import os
-import sqlite3
 from pathlib import Path
 
 from flask import Flask, jsonify, request, send_from_directory
 
+from db import read_state, write_state
 
 BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = BASE_DIR / "tasktracker.sqlite3"
 
 app = Flask(__name__, static_folder=None)
-
-
-def init_db():
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS app_state (
-                id INTEGER PRIMARY KEY CHECK (id = 1),
-                payload TEXT NOT NULL,
-                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-            """
-        )
-
-
-def read_state():
-    init_db()
-    with sqlite3.connect(DB_PATH) as conn:
-        row = conn.execute("SELECT payload FROM app_state WHERE id = 1").fetchone()
-    if not row:
-        return None
-    return json.loads(row[0])
-
-
-def write_state(state):
-    init_db()
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute(
-            """
-            INSERT INTO app_state (id, payload, updated_at)
-            VALUES (1, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(id) DO UPDATE SET
-                payload = excluded.payload,
-                updated_at = CURRENT_TIMESTAMP
-            """,
-            (json.dumps(state),),
-        )
 
 
 @app.get("/api/tasktracker/state")
